@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- 扫描包  -->
+	<!--<context:component-scan base-package="com.zhiyou.service"></context:component-scan>-->
+	<context:component-scan base-package="com.zhiyou.dao"></context:component-scan>
+	
+	<!-- 配置过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+			 <!-- 注入安全管理器 -->
+        <property name="securityManager" ref="secruityManager"></property>
+        <!-- 注入系统的登录访问路径 -->
+        <!-- 跳转到登录页面 -->
+        <property name="loginUrl" value="/login.jsp"></property>
+        <!-- 成功页面 -->
+        <property name="successUrl" value="/index.jsp"></property>
+        <!-- 权限不足的错误提示页面 -->
+        <property name="unauthorizedUrl" value="/error.jsp"></property>
+        <!-- 基于URL拦截权限控制 -->
+        <property name="filters">  
+            <map>  
+                <entry key="authc">  
+                    <bean class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter"/>  
+                </entry>  
+            </map>  
+        </property>
+        <!-- 
+            URL路径自上而下进行匹配
+         -->
+        <!-- 
+			是所有的请求都要经过登录过滤器,如果没有登录就会跳 转到登录界面,所以静态资源同样会被拦截
+
+            anon过滤器处理原则 ：随便访问
+            authc需要进行权限认证
+         -->
+        <property name="filterChainDefinitions">
+            <value>
+                /css/** = anon
+                /images/** = anon
+                /js/** = anon
+                /lib/** = anon
+                /login.jsp* = anon
+                /other.jsp = anon
+                /index.jsp = anon
+                /user/login = anon
+                /** = authc  
+            </value>
+        </property>
+	
+	
+	</bean>
+	
+	
+	<bean id="schoolRealm" class="com.zhiyou.realm.SchoolRealm"></bean>
+	
+	<!-- 安全管理器  securityManager -->
+	<bean id="secruityManager"  class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="schoolRealm"></property>
+	</bean>
+	
+	
+</beans>
